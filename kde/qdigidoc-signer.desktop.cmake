@@ -13,5 +13,5 @@ X-KDE-PluginInfo-Version=1.0
 Name=Sign digitally
 Name[et]=Allkirjasta digitaalselt
 Name[ru]=Подписать дигитально
-Icon=qdigidoc-client
-Exec=qdigidocclient %U
+Icon=${DIGIDOC_ICON}
+Exec=${DIGIDOC_EXECUTABLE} %U

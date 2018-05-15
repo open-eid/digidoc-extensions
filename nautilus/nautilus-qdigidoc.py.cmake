@@ -34,7 +34,7 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
         args = ""
         for path in paths:
             args += "\"%s\" " % path
-        cmd = ("${PROJECT_NAME} " + args + "&")
+        cmd = ("${DIGIDOC_EXECUTABLE} " + args + "&")
         os.system(cmd)
 
     def menu_activate_cb(self, menu, paths):
@@ -67,7 +67,7 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
             label=_('Sign digitally'),
             tip=tooltip_message
         )
-        item.set_property('icon', 'qdigidoc-client')
+        item.set_property('icon', '${DIGIDOC_ICON}')
 
         item.connect('activate', self.menu_activate_cb, paths)
         return item,
