@@ -16,7 +16,7 @@ set_target_properties( DigiDocQL PROPERTIES
 	XCODE_ATTRIBUTE_WRAPPER_EXTENSION qlgenerator
 	MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist
 	AUTOMOC OFF
-	INCLUDE_DIRECTORIES "${OPENSSL_INCLUDE_DIR};${LIBDIGIDOCPP_INCLUDE_DIR}"
+	INCLUDE_DIRECTORIES "${LIBDIGIDOCPP_INCLUDE_DIR}"
 	COMPILE_FLAGS "-Wno-unused-parameter"
 	LINK_LIBRARIES "-framework QuickLook;-framework digidocpp;-framework Cocoa"
 	LINK_FLAGS "-F/Library/Frameworks -fobjc-arc"
