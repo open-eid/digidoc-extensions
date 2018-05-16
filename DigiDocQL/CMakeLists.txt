@@ -1,5 +1,5 @@
 set( RESOURCES ../../client/mac/Resources/asic.icns )
-configure_file( GeneratePreviewForURL.mm.in ${CMAKE_CURRENT_BINARY_DIR}/GeneratePreviewForURL.mm )
+configure_file( GeneratePreviewForURL.mm.cmake ${CMAKE_CURRENT_BINARY_DIR}/GeneratePreviewForURL.mm )
 add_library( DigiDocQL MODULE
 	${RESOURCES}
 	Info.plist
