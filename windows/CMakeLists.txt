@@ -67,7 +67,7 @@ add_custom_target(msishellext DEPENDS EsteidShellExtension
         EsteidShellExtension.wixobj WelcomeDlg2.wixobj WixUI_Minimal2.wixobj
         -dWixUIDialogBmp=${CMAKE_SOURCE_DIR}/cmake/modules/dlgbmp.bmp
         -dWixUIBannerBmp=${CMAKE_SOURCE_DIR}/cmake/modules/banner.bmp
-        -o "Digidoc3_ShellExt-${VERSION}$ENV{VER_SUFFIX}.${PLATFORM}.msi"
+        -o "Digidoc_ShellExt-${VERSION}$ENV{VER_SUFFIX}.${PLATFORM}.msi"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
@@ -79,6 +79,6 @@ if(SIGNCERT)
     add_custom_command(TARGET msishellext POST_BUILD
         COMMAND signtool.exe sign /a /v /s MY /n "${SIGNCERT}" /fd SHA256 /du http://installer.id.ee
             /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /td SHA256
-            "${CMAKE_BINARY_DIR}/Digidoc3_ShellExt-${VERSION}$ENV{VER_SUFFIX}.${PLATFORM}.msi"
+            "${CMAKE_BINARY_DIR}/Digidoc_ShellExt-${VERSION}$ENV{VER_SUFFIX}.${PLATFORM}.msi"
     )
 endif()
