@@ -137,7 +137,7 @@ public:
 		std::string home = "~";
 		if(char *var = getenv("HOME"))
 			home = var;
-		return home + "/Library/Containers/ee.ria.${PROJECT_NAME}/Data/Library/Application Support/RIA/${PROJECT_NAME}/";
+		return home + "/Library/Containers/ee.ria." BUNDLE_NAME "/Data/Library/Application Support/RIA/" BUNDLE_NAME "/";
 	}
 };
 

@@ -1,11 +1,10 @@
 set( RESOURCES ../../client/mac/Resources/asic.icns )
-configure_file( GeneratePreviewForURL.mm.cmake ${CMAKE_CURRENT_BINARY_DIR}/GeneratePreviewForURL.mm )
 add_library( DigiDocQL MODULE
 	${RESOURCES}
 	Info.plist
 	main.c
 	GenerateThumbnailForURL.c
-	${CMAKE_CURRENT_BINARY_DIR}/GeneratePreviewForURL.mm
+	GeneratePreviewForURL.mm
 )
 set_source_files_properties( GeneratePreviewForURL.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc" )
 set_source_files_properties( Info.plist PROPERTIES MACOSX_PACKAGE_LOCATION . )
@@ -18,6 +17,7 @@ set_target_properties( DigiDocQL PROPERTIES
 	AUTOMOC OFF
 	INCLUDE_DIRECTORIES "${LIBDIGIDOCPP_INCLUDE_DIR}"
 	COMPILE_FLAGS "-Wno-unused-parameter"
+	COMPILE_DEFINITIONS "BUNDLE_NAME=\"${BUNDLE_NAME}\""
 	LINK_LIBRARIES "-framework QuickLook;-framework digidocpp;-framework Cocoa"
 	LINK_FLAGS "-F/Library/Frameworks -fobjc-arc"
 	BUILD_WITH_INSTALL_RPATH YES
