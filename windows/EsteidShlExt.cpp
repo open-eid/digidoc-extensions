@@ -186,6 +186,8 @@ STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO pCmdInfo,
 	tstring parameters;
 	if (crypto)
 		parameters += _T("\"-crypto\" ");
+	else
+		parameters += _T("\"-sign\" ");
 	for (const tstring &file: m_Files) {
 		parameters += _T("\"") + file + _T("\" ");
 	}

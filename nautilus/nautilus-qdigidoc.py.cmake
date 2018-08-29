@@ -31,7 +31,7 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
         pass
 
     def _open_client(self, paths):
-        args = ""
+        args = "-sign "
         for path in paths:
             args += "\"%s\" " % path
         cmd = ("${DIGIDOC_EXECUTABLE} " + args + "&")
