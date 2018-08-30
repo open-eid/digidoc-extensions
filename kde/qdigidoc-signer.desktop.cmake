@@ -14,4 +14,4 @@ Name=Sign digitally
 Name[et]=Allkirjasta digitaalselt
 Name[ru]=Подписать дигитально
 Icon=${DIGIDOC_ICON}
-Exec=${DIGIDOC_EXECUTABLE} %U
+Exec=${DIGIDOC_EXECUTABLE} -sign %U
