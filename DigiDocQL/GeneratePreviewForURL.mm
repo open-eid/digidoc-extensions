@@ -17,78 +17,24 @@
  *
  */
 
+// https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/Quicklook_Programming_Guide/Introduction/Introduction.html
+
 #include <digidocpp/Container.h>
 #include <digidocpp/DataFile.h>
 #include <digidocpp/Signature.h>
 #include <digidocpp/Exception.h>
 #include <digidocpp/XmlConf.h>
-#include <digidocpp/crypto/X509Cert.h>
 
 #include <Foundation/Foundation.h>
 #include <QuickLook/QuickLook.h>
 
 using namespace digidoc;
 
-enum Type
-{
-	UnknownType = 0,
-	DigiIDType = 1,
-	EstEidType = 2,
-	MobileIDType = 4,
-	OCSPType = 8,
-	TempelType = 16,
-
-	TestType = 32,
-	DigiIDTestType = TestType|DigiIDType,
-	EstEidTestType = TestType|EstEidType,
-	MobileIDTestType = TestType|MobileIDType,
-	OCSPTestType = TestType|OCSPType,
-	TempelTestType = TestType|TempelType
-};
-
-static Type type(const X509Cert &cert, bool ocsp)
-{
-	for( const std::string &pol : cert.certificatePolicies() )
-	{
-		if(ocsp)
-		{
-			return pol.compare(0, 20, "1.3.6.1.4.1.10015.3.") == 0 ||
-				cert.subjectName("CN").find("TEST") != std::string::npos ?
-				OCSPTestType : OCSPType;
-		}
-
-		if(pol.compare(0, 22, "1.3.6.1.4.1.10015.1.1.") == 0)
-			return EstEidType;
-		else if(pol.compare(0, 22, "1.3.6.1.4.1.10015.1.2.") == 0)
-			return DigiIDType;
-		else if(pol.compare(0, 22, "1.3.6.1.4.1.10015.1.3.") == 0 ||
-			pol.compare(0, 23, "1.3.6.1.4.1.10015.11.1.") == 0)
-			return MobileIDType;
-
-		else if(pol.compare(0, 22, "1.3.6.1.4.1.10015.3.1.") == 0)
-			return EstEidTestType;
-		else if(pol.compare(0, 22, "1.3.6.1.4.1.10015.3.2.") == 0)
-			return DigiIDTestType;
-		else if(pol.compare(0, 22, "1.3.6.1.4.1.10015.3.3.") == 0 ||
-			pol.compare(0, 23, "1.3.6.1.4.1.10015.11.3.") == 0)
-			return MobileIDTestType;
-		else if(pol.compare(0, 22, "1.3.6.1.4.1.10015.3.7.") == 0 ||
-			(pol.compare(0, 22, "1.3.6.1.4.1.10015.7.1.") == 0 &&
-			cert.issuerName("CN").find("TEST") != std::string::npos) )
-			return TempelTestType;
-
-		else if(pol.compare(0, 22, "1.3.6.1.4.1.10015.7.1.") == 0)
-			return TempelType;
-	}
-
-	return UnknownType;
-}
-
-extern "C" {
+QL_EXTERN_C_BEGIN
 OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
 	CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);
 void CancelPreviewGeneration(void * /*thisInterface*/, QLPreviewRequestRef /*preview*/) {}
-}
+QL_EXTERN_C_END
 
 @interface NSString (Digidoc)
 + (NSString*)stdstring:(const std::string&)str;
@@ -110,11 +56,11 @@ void CancelPreviewGeneration(void * /*thisInterface*/, QLPreviewRequestRef /*pre
 		gb = 1UL << 3
 	};
 	if (bytes >= gb)
-		return [NSString stringWithFormat:@"%1.2f GB", float(bytes) / gb];
+		return [NSString stringWithFormat:@"%1.2f GB", double(bytes) / gb];
 	if (bytes >= mb)
-		return [NSString stringWithFormat:@"%1.2f MB", float(bytes) / mb];
+		return [NSString stringWithFormat:@"%1.2f MB", double(bytes) / mb];
 	if (bytes >= kb)
-		return [NSString stringWithFormat:@"%1.1f KB", float(bytes) / kb];
+		return [NSString stringWithFormat:@"%1.1f KB", double(bytes) / kb];
 	return [NSString stringWithFormat:@"%lu bytes", bytes];
 }
 
@@ -130,9 +76,9 @@ void CancelPreviewGeneration(void * /*thisInterface*/, QLPreviewRequestRef /*pre
 class DigidocConf: public digidoc::XmlConfCurrent
 {
 public:
-	bool TSLAutoUpdate() const { return false; }
-	bool TSLOnlineDigest() const { return false; }
-	std::string TSLCache() const
+	bool TSLAutoUpdate() const final { return false; }
+	bool TSLOnlineDigest() const final { return false; }
+	std::string TSLCache() const final
 	{
 		std::string home = "~";
 		if(char *var = getenv("HOME"))
@@ -144,26 +90,21 @@ public:
 OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef preview,
 	CFURLRef url, CFStringRef /*contentTypeUTI*/, CFDictionaryRef /*options*/)
 {
+	@autoreleasepool {
 	NSMutableString *h = [NSMutableString string];
 	[h appendString:@"<html><head><style>"];
-	[h appendString:@"* { font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif }"];
-	[h appendString:@"body { font-size: 10pt }"];
-	[h appendFormat:@"h2 { padding-left: 50px; background: url(cid:asic.icns); background-size: 42px 42px; background-repeat:no-repeat; }"];
-	[h appendString:@"font, dt { color: #808080 }"];
-	[h appendString:@"dt { float: left; clear: left; margin-left: 30px; margin-right: 10px }"];
-	[h appendString:@"dl { margin-bottom: 10px }"];
+	[h appendString:@"* { font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif };"];
+	[h appendString:@"body { font-size: 10pt };"];
+	[h appendString:@"h2 { padding-left: 50px; background: url(cid:asic.icns); background-size: 42px 42px; background-repeat:no-repeat; };"];
+	[h appendString:@"font, dt { color: #808080 };"];
+	[h appendString:@"dt { float: left; clear: left; margin-left: 30px; margin-right: 10px };"];
+	[h appendString:@"dl { margin-bottom: 10px };"];
 	[h appendString:@"</style></head><body>"];
 	[h appendFormat:@"<h2>%@<hr size='1' /></h2>", [(__bridge NSURL*)url lastPathComponent]];
 	try
 	{
 		digidoc::Conf::init( new DigidocConf );
 		digidoc::initialize();
-		Exception::setWarningIgnoreList({
-			Exception::ReferenceDigestWeak,
-			Exception::SignatureDigestWeak,
-			Exception::DataFileNameSpaceWarning,
-			Exception::IssuerNameSpaceWarning,
-			Exception::ProducedATLateWarning});
 		std::unique_ptr<Container> d(Container::open([(__bridge NSURL*)url path].UTF8String));
 
 		[h appendString:@"<font>Files</font><ol>"];
@@ -174,20 +115,7 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 
 		[h appendString:@"<font>Signatures</font>"];
 		for (const Signature *s : d->signatures()) {
-			X509Cert cert = s->signingCertificate();
-			X509Cert ocsp = s->OCSPCertificate();
-			Type t = type(cert, false);
-			std::string name;
-			if (t & TempelType) {
-				name = cert.subjectName("CN");
-			} else {
-				name = cert.subjectName("GN") + " " + cert.subjectName("SN");
-			}
-			name += " " + cert.subjectName("serialNumber");
-			if (t & TestType || type(ocsp, true) & TestType) {
-				name += " (TEST)";
-			}
-			[h appendFormat:@"<dl><dt>Signer</dt><dd>%@</dd>", [NSString stdstring:name]];
+			[h appendFormat:@"<dl><dt>Signer</dt><dd>%@</dd>", [NSString stdstring:s->signedBy()]];
 
 			NSString *date = [NSString stdstring:s->trustedSigningTime()];
 			[date stringByReplacingOccurrencesOfString:@"Z" withString:@"-0000"];
@@ -198,13 +126,18 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 			[df setDateFormat:@"YYYY-MM-dd HH:mm:ss z"];
 			[h appendFormat:@"<dt>Time</dt><dd>%@</dd>", [df stringFromDate:formateddate]];
 
-			bool valid = false;
-			try {
-				s->validate();
-				valid = true;
-			} catch (const Exception &) {
+			Signature::Validator v(s);
+			NSString *status = @"not valid";
+			switch(v.status())
+			{
+			case Signature::Validator::Valid: status = @"valid";
+			case Signature::Validator::Warning: status = @"valid with warnings";
+			case Signature::Validator::NonQSCD: status = @"valid with limitations";
+			case Signature::Validator::Test: status = @"valid test signature";
+			case Signature::Validator::Invalid: status = @"invalid";
+			case Signature::Validator::Unknown: status = @"unknown";
 			}
-			[h appendFormat:@"<dt>Validity</dt><dd>Signature is %@</dd>", valid ? @"valid" : @"not valid"];
+			[h appendFormat:@"<dt>Validity</dt><dd>Signature is %@</dd>", status];
 
 			NSMutableArray *roles = [NSMutableArray array];
 			for (const std::string &role : s->signerRoles()) {
@@ -238,17 +171,21 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 	[h appendString:@"</body></html>"];
 
 	NSBundle *bundle = [NSBundle bundleWithIdentifier:@"ee.ria.DigiDocQL"];
-	NSString *aimage = [bundle pathForResource:@"asic" ofType:@"icns"];
-	NSDictionary *aimgProps = @{
-		(__bridge NSString *)kQLPreviewPropertyMIMETypeKey : @"image/icns",
-		(__bridge NSString *)kQLPreviewPropertyAttachmentDataKey : [NSData dataWithContentsOfFile:aimage] };
+	NSData *image = [NSData dataWithContentsOfFile:[bundle pathForResource:@"asic" ofType:@"icns"]];
 	NSDictionary *props = @{
-		(__bridge NSString *)kQLPreviewPropertyTextEncodingNameKey : @"UTF-8",
-		(__bridge NSString *)kQLPreviewPropertyMIMETypeKey : @"text/html",
-		(__bridge NSString *)kQLPreviewPropertyWidthKey : [[bundle infoDictionary] valueForKey:@"QLPreviewWidth"],
-		(__bridge NSString *)kQLPreviewPropertyHeightKey : [[bundle infoDictionary] valueForKey:@"QLPreviewHeight"],
-		(__bridge NSString *)kQLPreviewPropertyAttachmentsKey : @{ @"asic.icns" : aimgProps } };
+		(__bridge id)kQLPreviewPropertyTextEncodingNameKey : @"UTF-8",
+		(__bridge id)kQLPreviewPropertyMIMETypeKey : @"text/html",
+		(__bridge id)kQLPreviewPropertyWidthKey : [[bundle infoDictionary] valueForKey:@"QLPreviewWidth"],
+		(__bridge id)kQLPreviewPropertyHeightKey : [[bundle infoDictionary] valueForKey:@"QLPreviewHeight"],
+		(__bridge id)kQLPreviewPropertyAttachmentsKey : @{
+			@"asic.icns" : @{
+				(__bridge id)kQLPreviewPropertyMIMETypeKey : @"image/icns",
+				(__bridge id)kQLPreviewPropertyAttachmentDataKey : image
+			}
+		}
+	};
 	QLPreviewRequestSetDataRepresentation(preview,
 		(__bridge CFDataRef)[h dataUsingEncoding:NSUTF8StringEncoding], kUTTypeHTML, (__bridge CFDictionaryRef)props);
+	}
 	return noErr;
 }
