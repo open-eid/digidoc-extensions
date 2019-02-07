@@ -28,3 +28,12 @@ msgstr[2] "Подписать выбранныйые файлы с ${DIGIDOC_NAM
 #: nautilus-qdigidoc.py:77
 msgid "Sign digitally"
 msgstr "Подписать дигитально"
+
+msgid "Encrypt selected file with ${DIGIDOC_NAME} Client"
+msgid_plural "Encrypt selected files with ${DIGIDOC_NAME} Client"
+msgstr[0] "Зашифруйте выбранный файл ${DIGIDOC_NAME} клиентом"
+msgstr[1] "Зашифруйте выбранныйые файлы ${DIGIDOC_NAME} клиентом"
+msgstr[2] "Зашифруйте выбранныйые файлы ${DIGIDOC_NAME} клиентом"
+
+msgid "Encrypt files"
+msgstr "Зашифруйте файлы"

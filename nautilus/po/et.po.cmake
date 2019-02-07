@@ -26,3 +26,11 @@ msgstr[1] "Allkirjasta valitud failid ${DIGIDOC_NAME} kliendiga"
 #: nautilus-qdigidoc.py:77
 msgid "Sign digitally"
 msgstr "Allkirjasta digitaalselt"
+
+msgid "Encrypt selected file with ${DIGIDOC_NAME} Client"
+msgid_plural "Encrypt selected files with ${DIGIDOC_NAME} Client"
+msgstr[0] "Krüpteeri valitud fail ${DIGIDOC_NAME} kliendiga"
+msgstr[1] "Krüpteeri valitud failid ${DIGIDOC_NAME} kliendiga"
+
+msgid "Encrypt files"
+msgstr "Krüpteeri failid"
