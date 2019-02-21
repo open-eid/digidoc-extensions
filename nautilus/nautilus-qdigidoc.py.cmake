@@ -26,19 +26,20 @@ from gi.repository import Nautilus, GObject, Gio
 
 APP = 'nautilus-qdigidoc'
 
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP)
+gettext.textdomain(APP)
+
 class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
     def __init__(self):
         pass
 
-    def _open_client(self, paths):
+    def menu_activate_cb(self, menu, paths):
         args = "-sign "
         for path in paths:
             args += "\"%s\" " % path
         cmd = ("${DIGIDOC_EXECUTABLE} " + args + "&")
         os.system(cmd)
-
-    def menu_activate_cb(self, menu, paths):
-        self._open_client(paths)
 
     def valid_file(self, file):
         return file.get_file_type() == Gio.FileType.REGULAR and file.get_uri_scheme() == 'file'
@@ -53,21 +54,48 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
         if len(paths) < 1:
             return
 
-        locale.setlocale(locale.LC_ALL, '')
-        gettext.bindtextdomain(APP)
-        gettext.textdomain(APP)
-        _ = gettext.gettext
-
-        tooltip_message = gettext.ngettext('Sign selected file with ${DIGIDOC_NAME} Client',
-                                           'Sign selected files with ${DIGIDOC_NAME} Client',
-                                           len(paths))
-
         item = Nautilus.MenuItem(
             name="OpenDigidocExtension::DigidocSigner",
-            label=_('Sign digitally'),
-            tip=tooltip_message
+            label=gettext.gettext('Sign digitally'),
+            tip=gettext.ngettext('Sign selected file with ${DIGIDOC_NAME} Client',
+                                 'Sign selected files with ${DIGIDOC_NAME} Client',
+                                 len(paths)),
+            icon='${DIGIDOC_ICON}'
         )
-        item.set_property('icon', '${DIGIDOC_ICON}')
+        item.connect('activate', self.menu_activate_cb, paths)
+        return item,
 
+class OpenCryptoExtension(GObject.GObject, Nautilus.MenuProvider):
+    def __init__(self):
+        pass
+
+    def menu_activate_cb(self, menu, paths):
+        args = "-crypto "
+        for path in paths:
+            args += "\"%s\" " % path
+        cmd = ("${DIGIDOC_EXECUTABLE} " + args + "&")
+        os.system(cmd)
+
+    def valid_file(self, file):
+        return file.get_file_type() == Gio.FileType.REGULAR and file.get_uri_scheme() == 'file'
+
+    def get_file_items(self, window, files):
+        paths = []
+        for file in files:
+            if self.valid_file(file):
+                path = urllib.unquote(file.get_uri()[7:])
+                paths.append(path)
+
+        if len(paths) < 1:
+            return
+
+        item = Nautilus.MenuItem(
+            name="OpenCryptoExtension::DigidocEncrypter",
+            label=gettext.gettext('Encrypt files'),
+            tip=gettext.ngettext('Encrypt selected file with ${DIGIDOC_NAME} Client',
+                                 'Encrypt selected files with ${DIGIDOC_NAME} Client',
+                                 len(paths)),
+            icon='${DIGIDOC_ICON}'
+        )
         item.connect('activate', self.menu_activate_cb, paths)
         return item,

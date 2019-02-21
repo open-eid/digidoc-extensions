@@ -1,7 +1,7 @@
 # Translation template for qdigidoc package.
 # This file is distributed under the same license as the qdigidoc package.
 # Erkko Kebbinau <erkko@smartlink.ee>, 2010.
-# Sander Lepik <sander@lepi.eu>, 2014.
+# Sander Lepik <sander@lepik.eu>, 2014.
 #
 #, fuzzy
 msgid ""
@@ -26,4 +26,12 @@ msgstr[1] ""
 
 #: nautilus-qdigidoc.py:77
 msgid "Sign digitally"
+msgstr ""
+
+msgid "Encrypt selected file with ${DIGIDOC_NAME} Client"
+msgid_plural "Encrypt selected files with ${DIGIDOC_NAME} Client"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Encrypt files"
 msgstr ""
