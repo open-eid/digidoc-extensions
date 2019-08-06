@@ -10,14 +10,14 @@ HKCR
 			}
 		}
 	}
-    NoRemove *
-    {
-        NoRemove ShellEx
-        {
-            NoRemove ContextMenuHandlers
-            {
-                ForceRemove EsteidShlExt = s '{310AAB39-76FE-401B-8A7F-0F578C5F6AB5}'
-            }
-        }
-    }
+	NoRemove *
+	{
+		NoRemove ShellEx
+		{
+			NoRemove ContextMenuHandlers
+			{
+				ForceRemove EsteidShlExt = s '{310AAB39-76FE-401B-8A7F-0F578C5F6AB5}'
+			}
+		}
+	}
 }

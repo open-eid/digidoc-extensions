@@ -18,17 +18,6 @@
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
 
-#define IDCARD_REGKEY L"SOFTWARE\\RIA\\Open-EID"
-#define IDCARD_REGVALUE L"Installed"
-
-#define MENU_SIGN 0
-#define MENU_ENCRYPT 1
-
-typedef std::basic_string<TCHAR> tstring;
-
-
-// CEsteidShlExt
-
 class ATL_NO_VTABLE CEsteidShlExt :
 	public CComObjectRootEx<CComSingleThreadModel>,
 	public CComCoClass<CEsteidShlExt, &CLSID_EsteidShlExt>,
@@ -54,18 +43,8 @@ public:
 		return S_OK;
 	}
 
-	void FinalRelease()
-	{
-	}
+	void FinalRelease() {}
 
-protected:
-	HBITMAP  m_CryptoBmp;
-	HBITMAP  m_DigidocBmp;
-	std::vector<tstring> m_Files;
-
-	STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO pCmdInfo, bool crypto = false);
-
-public:
 	// IShellExtInit
 	STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
 
@@ -74,8 +53,20 @@ public:
 	STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO);
 	STDMETHODIMP QueryContextMenu(HMENU, UINT, UINT, UINT, UINT);
 
+protected:
+	STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO pCmdInfo, bool crypto = false);
+
 private:
+	enum {
+		MENU_SIGN = 0,
+		MENU_ENCRYPT = 1,
+	};
+
+	using tstring = std::basic_string<TCHAR>;
 	bool WINAPI FindRegistryInstallPath(tstring* path);
+
+	HBITMAP m_DigidocBmp = nullptr;
+	std::vector<tstring> m_Files;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(EsteidShlExt), CEsteidShlExt)

@@ -6,29 +6,20 @@
 
 CEsteidShlExt::CEsteidShlExt()
 {
-	m_CryptoBmp = LoadBitmap(_AtlBaseModule.GetModuleInstance(),
-	                           MAKEINTRESOURCE(IDB_CRYPTOBMP));
 	m_DigidocBmp = LoadBitmap(_AtlBaseModule.GetModuleInstance(),
 	                           MAKEINTRESOURCE(IDB_DIGIDOCBMP));
 }
 
 CEsteidShlExt::~CEsteidShlExt()
 {
-	if (m_CryptoBmp != NULL)
-		DeleteObject(m_CryptoBmp);
-	if (m_DigidocBmp != NULL)
-		DeleteObject(m_DigidocBmp);
+	DeleteObject(m_DigidocBmp);
 }
 
-
-STDMETHODIMP CEsteidShlExt::Initialize (
-	LPCITEMIDLIST pidlFolder, LPDATAOBJECT pDataObj, HKEY hProgID )
+STDMETHODIMP CEsteidShlExt::Initialize(
+	LPCITEMIDLIST /* pidlFolder */, LPDATAOBJECT pDataObj, HKEY /* hProgID */)
 {
-	FORMATETC fmt = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 	STGMEDIUM stg = { TYMED_HGLOBAL };
-	HDROP     hDrop;
-	TCHAR szFile[MAX_PATH];
-	HRESULT hr = S_OK;
 	m_Files.clear();
 
 	// Look for CF_HDROP data in the data object.
@@ -38,16 +29,14 @@ STDMETHODIMP CEsteidShlExt::Initialize (
 	}
 
 	// Get a pointer to the actual data.
-	hDrop = (HDROP) GlobalLock(stg.hGlobal);
-
-	// Make sure it worked.
-	if (hDrop == NULL) {
+	HDROP hDrop = HDROP(GlobalLock(stg.hGlobal));
+	if (!hDrop) {
 		ReleaseStgMedium(&stg);
 		return E_INVALIDARG;
 	}
 
 	// Sanity check - make sure there is at least one filename.
-	UINT nFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+	UINT nFiles = DragQueryFile(hDrop, 0xFFFFFFFF, nullptr, 0);
 	if (nFiles == 0) {
 		GlobalUnlock(stg.hGlobal);
 		ReleaseStgMedium(&stg);
@@ -56,11 +45,12 @@ STDMETHODIMP CEsteidShlExt::Initialize (
 
 	for (UINT i = 0; i < nFiles; i++) {
 		// Get path length in chars
-		UINT len = DragQueryFile(hDrop, i, NULL, 0);
+		UINT len = DragQueryFile(hDrop, i, nullptr, 0);
 		if (len == 0 || len >= MAX_PATH)
 			continue;
 
 		// Get the name of the file
+		TCHAR szFile[MAX_PATH];
 		if (DragQueryFile(hDrop, i, szFile, len+1) == 0)
 			continue;
 
@@ -71,39 +61,50 @@ STDMETHODIMP CEsteidShlExt::Initialize (
 		m_Files.push_back(str);
 	}
 
-	if (m_Files.empty()) {
-		// Don't show menu if no items were found
-		hr = E_INVALIDARG;
-	}
-
 	GlobalUnlock(stg.hGlobal);
 	ReleaseStgMedium(&stg);
 
-	return hr;
+	// Don't show menu if no items were found
+	return m_Files.empty() ? E_INVALIDARG : S_OK;
 }
 
-STDMETHODIMP CEsteidShlExt::QueryContextMenu (
+STDMETHODIMP CEsteidShlExt::QueryContextMenu(
 	HMENU hmenu, UINT uMenuIndex, UINT uidFirstCmd,
-	UINT uidLastCmd, UINT uFlags )
+	UINT /* uidLastCmd */, UINT uFlags)
 {
 	// If the flags include CMF_DEFAULTONLY then we shouldn't do anything.
 	if (uFlags & CMF_DEFAULTONLY)
 		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
 
-	InsertMenu(hmenu, uMenuIndex, MF_STRING | MF_BYPOSITION, uidFirstCmd, _T("Allkirjasta digitaalselt"));
-	if (m_DigidocBmp != NULL)
-		SetMenuItemBitmaps(hmenu, uMenuIndex, MF_BYPOSITION, m_DigidocBmp, NULL);
-	InsertMenu(hmenu, uMenuIndex + MENU_ENCRYPT, MF_STRING | MF_BYPOSITION, uidFirstCmd + MENU_ENCRYPT, _T("Krüpteeri"));
-	if (m_CryptoBmp != NULL)
-		SetMenuItemBitmaps(hmenu, uMenuIndex + MENU_ENCRYPT, MF_BYPOSITION, m_CryptoBmp, NULL);
+	PCTCH sign = _T("Sign digitally");
+	PCTCH encrypt = _T("Encrypt");
+	switch (PRIMARYLANGID(GetUserDefaultUILanguage()))
+	{
+	case LANG_ESTONIAN:
+		sign = _T("Allkirjasta digitaalselt");
+		encrypt = _T("Krüpteeri");
+		break;
+	case LANG_RUSSIAN:
+		sign = _T("Подписать дигитально");
+		encrypt = _T("Зашифровать");
+		break;
+	default: break;
+	}
+
+	InsertMenu(hmenu, uMenuIndex, MF_STRING | MF_BYPOSITION, uidFirstCmd, sign);
+	if (m_DigidocBmp)
+		SetMenuItemBitmaps(hmenu, uMenuIndex, MF_BYPOSITION, m_DigidocBmp, nullptr);
+	InsertMenu(hmenu, uMenuIndex + MENU_ENCRYPT, MF_STRING | MF_BYPOSITION, uidFirstCmd + MENU_ENCRYPT, encrypt);
+	if (m_DigidocBmp)
+		SetMenuItemBitmaps(hmenu, uMenuIndex + MENU_ENCRYPT, MF_BYPOSITION, m_DigidocBmp, nullptr);
 
 	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 2);
 }
 
-STDMETHODIMP CEsteidShlExt::GetCommandString (
-	UINT_PTR idCmd, UINT uFlags, UINT* pwReserved, LPSTR pszName, UINT cchMax )
+STDMETHODIMP CEsteidShlExt::GetCommandString(
+	UINT_PTR idCmd, UINT uFlags, UINT * /* pwReserved */, LPSTR pszName, UINT cchMax)
 {
-USES_CONVERSION;
+	USES_CONVERSION;
 
 	// Check idCmd, it must be 0 or 1 since we have only two menu items.
 	if (idCmd > MENU_ENCRYPT)
@@ -117,10 +118,10 @@ USES_CONVERSION;
 		if (uFlags & GCS_UNICODE) {
 			// We need to cast pszName to a Unicode string, and then use the
 			// Unicode string copy API.
-			lstrcpynW((LPWSTR) pszName, T2CW(szText), cchMax);
+			lstrcpynW(LPWSTR(pszName), T2CW(szText), int(cchMax));
 		} else {
 			// Use the ANSI string copy API to return the help string.
-			lstrcpynA(pszName, T2CA(szText), cchMax);
+			lstrcpynA(pszName, T2CA(szText), int(cchMax));
 		}
 
 		return S_OK;
@@ -131,30 +132,28 @@ USES_CONVERSION;
 
 bool WINAPI CEsteidShlExt::FindRegistryInstallPath(tstring* path)
 {
-	bool success = false;
+	static PCTCH IDCARD_REGKEY = _T("SOFTWARE\\RIA\\Open-EID");
+	static PCTCH IDCARD_REGVALUE = _T("Installed");
 	HKEY hkey;
 	DWORD dwSize = MAX_PATH * sizeof(TCHAR);
 	TCHAR szInstalldir[MAX_PATH];
-	DWORD dwRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE, IDCARD_REGKEY, 0, KEY_QUERY_VALUE, &hkey);
-	
+	LSTATUS dwRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE, IDCARD_REGKEY, 0, KEY_QUERY_VALUE, &hkey);
 	if (dwRet == ERROR_SUCCESS) {
-		dwRet = RegQueryValueEx(hkey, IDCARD_REGVALUE, NULL, NULL, (LPBYTE)szInstalldir, &dwSize);
+		dwRet = RegQueryValueEx(hkey, IDCARD_REGVALUE, nullptr, nullptr, LPBYTE(szInstalldir), &dwSize);
 		RegCloseKey(hkey);
 		*path = tstring(szInstalldir);
-		success = true;
-	} else {
-		DWORD dwRet = RegOpenKeyEx(HKEY_CURRENT_USER, IDCARD_REGKEY, 0, KEY_QUERY_VALUE, &hkey);
-		if (dwRet == ERROR_SUCCESS) {
-			RegCloseKey(hkey);
-			*path = tstring(szInstalldir);
-			success = true;
-		}
+		return true;
 	}
-
-	return success;
+	dwRet = RegOpenKeyEx(HKEY_CURRENT_USER, IDCARD_REGKEY, 0, KEY_QUERY_VALUE, &hkey);
+	if (dwRet == ERROR_SUCCESS) {
+		RegCloseKey(hkey);
+		*path = tstring(szInstalldir);
+		return true;
+	}
+	return false;
 }
 
-STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO pCmdInfo, bool crypto)
+STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO /* pCmdInfo */, bool crypto)
 {
 	if (m_Files.empty())
 		return E_INVALIDARG;
@@ -183,18 +182,11 @@ STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO pCmdInfo,
 	}
 
 	// Construct command line arguments to pass to qdigidocclient.exe
-	tstring parameters;
-	if (crypto)
-		parameters += _T("\"-crypto\" ");
-	else
-		parameters += _T("\"-sign\" ");
-	for (const tstring &file: m_Files) {
+	tstring parameters = crypto ? _T("\"-crypto\" ") : _T("\"-sign\" ");
+	for (const tstring &file: m_Files)
 		parameters += _T("\"") + file + _T("\" ");
-	}
 
-	SHELLEXECUTEINFO  seInfo;
-	memset(&seInfo, 0, sizeof(SHELLEXECUTEINFO));
-	seInfo.cbSize       = sizeof(SHELLEXECUTEINFO);
+	SHELLEXECUTEINFO  seInfo = { sizeof(SHELLEXECUTEINFO) };
 	seInfo.lpFile       = command.c_str();
 	seInfo.lpParameters = parameters.c_str();
 	seInfo.nShow        = SW_SHOW;
@@ -211,13 +203,9 @@ STDMETHODIMP CEsteidShlExt::InvokeCommand(LPCMINVOKECOMMANDINFO pCmdInfo)
 	switch (LOWORD(pCmdInfo->lpVerb)) {
 	case MENU_SIGN:
 		return ExecuteDigidocclient(pCmdInfo);
-		break;
 	case MENU_ENCRYPT:
 		return ExecuteDigidocclient(pCmdInfo, true);
-		break;
-
 	default:
 		return E_INVALIDARG;
-		break;
 	}
 }

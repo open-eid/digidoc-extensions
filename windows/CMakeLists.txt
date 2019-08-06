@@ -1,12 +1,3 @@
-add_definitions(
-    -D_UNICODE
-    -DUNICODE
-    -D_MERGE_PROXYSTUB
-    -D_WINDLL
-)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(MIDL_TARGET "x64")
     set(PLATFORM "x64")
@@ -14,20 +5,6 @@ else()
     set(MIDL_TARGET "win32")
     set(PLATFORM "x86")
 endif()
-
-foreach(CompilerFlag
-    CMAKE_CXX_FLAGS
-    CMAKE_CXX_FLAGS_DEBUG
-    CMAKE_CXX_FLAGS_RELEASE
-    CMAKE_CXX_FLAGS_MINSIZEREL
-    CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    CMAKE_C_FLAGS
-    CMAKE_C_FLAGS_DEBUG
-    CMAKE_C_FLAGS_RELEASE
-    CMAKE_C_FLAGS_MINSIZEREL
-    CMAKE_C_FLAGS_RELWITHDEBINFO)
-    string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-endforeach()
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/EsteidShellExtension_i.h
@@ -55,7 +32,11 @@ add_library(EsteidShellExtension SHARED
     EsteidShellExtension.rgs
     EsteidShlExt.rgs
 )
-install(TARGETS EsteidShellExtension DESTINATION ${CMAKE_INSTALL_BINDIR})
+set_target_properties(EsteidShellExtension PROPERTIES
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    COMPILE_DEFINITIONS "_UNICODE;UNICODE;_MERGE_PROXYSTUB;_WINDLL"
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 add_custom_target(msishellext DEPENDS EsteidShellExtension
     COMMAND "$ENV{WIX}bin\\candle.exe" -nologo -arch ${PLATFORM}
