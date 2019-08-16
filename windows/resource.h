@@ -6,7 +6,6 @@
 #define IDR_ESTEIDEXT                   101
 #define IDR_ESTEIDSHLEXT                102
 #define IDB_DIGIDOCBMP                  201
-#define IDB_CRYPTOBMP                   202
 
 // Next default values for new objects
 // 
