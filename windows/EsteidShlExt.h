@@ -5,15 +5,6 @@
 
 #include "EsteidShellExtension_i.h"
 
-#include <shlobj.h>
-#include <comdef.h>
-#include <winreg.h>
-#include <tchar.h>
-
-#include <string>
-#include <vector>
-
-
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
@@ -38,23 +29,13 @@ public:
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-	HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
-
-	void FinalRelease() {}
-
 	// IShellExtInit
-	STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
+	STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY) override;
 
 	// IContextMenu
-	STDMETHODIMP GetCommandString(UINT_PTR, UINT, UINT*, LPSTR, UINT);
-	STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO);
-	STDMETHODIMP QueryContextMenu(HMENU, UINT, UINT, UINT, UINT);
-
-protected:
-	STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO pCmdInfo, bool crypto = false);
+	STDMETHODIMP QueryContextMenu(HMENU, UINT, UINT, UINT, UINT) override;
+	STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO) override;
+	STDMETHODIMP GetCommandString(UINT_PTR, UINT, UINT*, LPSTR, UINT) override;
 
 private:
 	enum {
@@ -64,6 +45,7 @@ private:
 
 	using tstring = std::basic_string<TCHAR>;
 	bool WINAPI FindRegistryInstallPath(tstring* path);
+	STDMETHODIMP ExecuteDigidocclient(LPCMINVOKECOMMANDINFO pCmdInfo, bool crypto = false);
 
 	HBITMAP m_DigidocBmp = nullptr;
 	std::vector<tstring> m_Files;
