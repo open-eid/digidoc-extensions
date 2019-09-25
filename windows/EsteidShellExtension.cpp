@@ -2,7 +2,6 @@
 
 
 #include "stdafx.h"
-#include "resource.h"
 #include "EsteidShellExtension_i.h"
 #include "dllmain.h"
 

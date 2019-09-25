@@ -11,17 +11,16 @@
 #include "targetver.h"
 #endif
 #include "winres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -78,8 +77,8 @@ BEGIN
             VALUE "CompanyName", "RIA"
             VALUE "FileDescription", "Estonian ID Card Software explorer integration"
             VALUE "FileVersion", VER_STR(MAJOR_VER.MINOR_VER.RELEASE_VER.BUILD_VER)
-            VALUE "LegalCopyright", "(c) RIA.  All rights reserved."
             VALUE "InternalName", "EsteidShellExtension.dll"
+            VALUE "LegalCopyright", "(c) RIA.  All rights reserved."
             VALUE "OriginalFilename", "EsteidShellExtension.dll"
             VALUE "ProductName", "Estonian ID Card Software"
             VALUE "ProductVersion", VER_STR(MAJOR_VER.MINOR_VER.RELEASE_VER.BUILD_VER)
@@ -99,28 +98,27 @@ END
 
 IDR_ESTEIDEXT           REGISTRY                "EsteidShellExtension.rgs"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "EsteidShellExtension"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Estonian resources
+// Estonian (Estonia) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ETI)
-#ifdef _WIN32
 LANGUAGE LANG_ESTONIAN, SUBLANG_DEFAULT
 #pragma code_page(1257)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -129,13 +127,16 @@ LANGUAGE LANG_ESTONIAN, SUBLANG_DEFAULT
 
 IDR_ESTEIDSHLEXT        REGISTRY                "EsteidShlExt.rgs"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
 IDB_DIGIDOCBMP          BITMAP                  "resources\\digidoc.bmp"
-#endif    // Estonian resources
+IDB_DIGIDOCBMP_32       BITMAP                  "resources\\digidoc_32.bmp"
+
+#endif    // Estonian (Estonia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -145,6 +146,7 @@ IDB_DIGIDOCBMP          BITMAP                  "resources\\digidoc.bmp"
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
+
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

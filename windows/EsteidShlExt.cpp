@@ -3,11 +3,13 @@
 #include "stdafx.h"
 #include "EsteidShlExt.h"
 
-
 CEsteidShlExt::CEsteidShlExt()
 {
-	m_DigidocBmp = LoadBitmap(_AtlBaseModule.GetModuleInstance(),
-	                           MAKEINTRESOURCE(IDB_DIGIDOCBMP));
+	HDC screen = GetDC(nullptr);
+	double dpiy = GetDeviceCaps(screen, LOGPIXELSY);
+	ReleaseDC(nullptr, screen);
+	LPTSTR digidocBmpId = (dpiy / double(96)) > 1.0 ? MAKEINTRESOURCE(IDB_DIGIDOCBMP_32) : MAKEINTRESOURCE(IDB_DIGIDOCBMP);
+	m_DigidocBmp = LoadBitmap(_AtlBaseModule.GetModuleInstance(), digidocBmpId);
 }
 
 CEsteidShlExt::~CEsteidShlExt()

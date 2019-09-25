@@ -18,6 +18,9 @@
 #include "resource.h"
 #include <atlbase.h>
 #include <atlcom.h>
-#include <atlctl.h>
+#include <ShlObj.h>
+#include <comdef.h>
+#include <string>
+#include <vector>
 
 using namespace ATL;
