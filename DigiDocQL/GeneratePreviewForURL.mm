@@ -130,12 +130,12 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 			NSString *status = @"not valid";
 			switch(v.status())
 			{
-			case Signature::Validator::Valid: status = @"valid";
-			case Signature::Validator::Warning: status = @"valid with warnings";
-			case Signature::Validator::NonQSCD: status = @"valid with limitations";
-			case Signature::Validator::Test: status = @"valid test signature";
-			case Signature::Validator::Invalid: status = @"invalid";
-			case Signature::Validator::Unknown: status = @"unknown";
+			case Signature::Validator::Valid: status = @"valid"; break;
+			case Signature::Validator::Warning: status = @"valid with warnings"; break;
+			case Signature::Validator::NonQSCD: status = @"valid with limitations"; break;
+			case Signature::Validator::Test: status = @"valid test signature"; break;
+			case Signature::Validator::Invalid: status = @"invalid"; break;
+			case Signature::Validator::Unknown: status = @"unknown"; break;
 			}
 			[h appendFormat:@"<dt>Validity</dt><dd>Signature is %@</dd>", status];
 
