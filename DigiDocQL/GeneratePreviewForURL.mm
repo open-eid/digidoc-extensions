@@ -48,6 +48,16 @@ QL_EXTERN_C_END
 	return str.empty() ? [NSString string] : [NSString stringWithUTF8String:str.c_str()];
 }
 
++ (NSString*)htmlEntityEncode:(NSString*)str
+{
+	str = [str stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"];
+	str = [str stringByReplacingOccurrencesOfString:@"\"" withString:@"&quot;"];
+	str = [str stringByReplacingOccurrencesOfString:@"'" withString:@"&apos;"];
+	str = [str stringByReplacingOccurrencesOfString:@"<" withString:@"&lt;"];
+	str = [str stringByReplacingOccurrencesOfString:@">" withString:@"&gt;"];
+	return str;
+}
+
 + (NSString*)fileSize:(unsigned long)bytes
 {
 	enum {
@@ -100,7 +110,7 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 	[h appendString:@"dt { float: left; clear: left; margin-left: 30px; margin-right: 10px };"];
 	[h appendString:@"dl { margin-bottom: 10px };"];
 	[h appendString:@"</style></head><body>"];
-	[h appendFormat:@"<h2>%@<hr size='1' /></h2>", [(__bridge NSURL*)url lastPathComponent]];
+	[h appendFormat:@"<h2>%@<hr size='1' /></h2>", [NSString htmlEntityEncode:[(__bridge NSURL*)url lastPathComponent]]];
 	try
 	{
 		digidoc::Conf::init( new DigidocConf );
@@ -109,13 +119,13 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 
 		[h appendString:@"<font>Files</font><ol>"];
 		for (const DataFile *doc : d->dataFiles()) {
-			[h appendFormat:@"<li>%@</li>", [NSString stdstring:doc->fileName()]];
+			[h appendFormat:@"<li>%@</li>", [NSString htmlEntityEncode:[NSString stdstring:doc->fileName()]]];
 		}
 		[h appendString:@"</ol>"];
 
 		[h appendString:@"<font>Signatures</font>"];
 		for (const Signature *s : d->signatures()) {
-			[h appendFormat:@"<dl><dt>Signer</dt><dd>%@</dd>", [NSString stdstring:s->signedBy()]];
+			[h appendFormat:@"<dl><dt>Signer</dt><dd>%@</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->signedBy()]]];
 
 			NSString *date = [NSString stdstring:s->trustedSigningTime()];
 			[date stringByReplacingOccurrencesOfString:@"Z" withString:@"-0000"];
@@ -142,23 +152,23 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 			NSMutableArray *roles = [NSMutableArray array];
 			for (const std::string &role : s->signerRoles()) {
 				if( !role.empty() ) {
-					[roles addObject:[NSString stdstring:role]];
+					[roles addObject:[NSString htmlEntityEncode:[NSString stdstring:role]]];
 				}
 			}
 			if( [roles count] > 0 ) {
-				[h appendFormat:@"<dt>Role</dt><dd>%@&nbsp;</dd>", [roles componentsJoinedByString:@" / "]];
+				[h appendFormat:@"<dt>Role</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[roles componentsJoinedByString:@" / "]]];
 			}
 			if (!s->countryName().empty()) {
-				[h appendFormat:@"<dt>Country</dt><dd>%@&nbsp;</dd>", [NSString stdstring:s->countryName()]];
+				[h appendFormat:@"<dt>Country</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->countryName()]]];
 			}
 			if (!s->city().empty()) {
-				[h appendFormat:@"<dt>City</dt><dd>%@&nbsp;</dd>", [NSString stdstring:s->city()]];
+				[h appendFormat:@"<dt>City</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->city()]]];
 			}
 			if (!s->stateOrProvince().empty()) {
-				[h appendFormat:@"<dt>State</dt><dd>%@&nbsp;</dd>", [NSString stdstring:s->stateOrProvince()]];
+				[h appendFormat:@"<dt>State</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->stateOrProvince()]]];
 			}
 			if (!s->postalCode().empty()) {
-				[h appendFormat:@"<dt>Postal code</dt><dd>%@&nbsp;</dd>", [NSString stdstring:s->postalCode()]];
+				[h appendFormat:@"<dt>Postal code</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->postalCode()]]];
 			}
 			[h appendString:@"</dl>"];
 		}
