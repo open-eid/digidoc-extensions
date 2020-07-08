@@ -11,7 +11,6 @@
 			<string>QLGenerator</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>ee.ria.ddoc</string>
 				<string>ee.ria.bdoc</string>
 				<string>ee.ria.asics</string>
 			</array>
