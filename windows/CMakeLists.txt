@@ -35,7 +35,10 @@ add_library(EsteidShellExtension SHARED
 set_target_properties(EsteidShellExtension PROPERTIES
     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
     COMPILE_DEFINITIONS "_UNICODE;UNICODE;_MERGE_PROXYSTUB;_WINDLL"
+    COMPILE_OPTIONS "/guard:cf"
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}
+    INTERPROCEDURAL_OPTIMIZATION YES
+    LINK_OPTIONS "/guard:cf"
 )
 
 add_custom_target(msishellext DEPENDS EsteidShellExtension
@@ -53,9 +56,14 @@ add_custom_target(msishellext DEPENDS EsteidShellExtension
 )
 
 if(SIGNCERT)
+    if(CROSSSIGNCERT)
+        target_link_options(EsteidShellExtension PRIVATE "/INTEGRITYCHECK")
+    endif()
     add_custom_command(TARGET EsteidShellExtension POST_BUILD
         COMMAND signtool.exe sign /a /v /s MY /n "${SIGNCERT}" /fd SHA256 /du http://installer.id.ee
+            "$<$<BOOL:${CROSSSIGNCERT}>:/ph;/ac;${CROSSSIGNCERT}>"
             /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /td SHA256 $<TARGET_FILE:EsteidShellExtension>
+        COMMAND_EXPAND_LISTS
     )
     add_custom_command(TARGET msishellext POST_BUILD
         COMMAND signtool.exe sign /a /v /s MY /n "${SIGNCERT}" /fd SHA256 /du http://installer.id.ee
