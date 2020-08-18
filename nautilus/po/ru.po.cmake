@@ -2,14 +2,15 @@
 # This file is distributed under the same license as the qdigidoc package.
 # Erkko Kebbinau <erkko@smartlink.ee>, 2010.
 # Sander Lepik <sander@lepik.eu>, 2014.
+# Edmund Laugasson <edmund.laugasson@eesti.ee>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: qdigidoc-3.9.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-08-25 15:51+0300\n"
-"PO-Revision-Date: 2014-11-11 14:24+0200\n"
-"Last-Translator: Sander Lepik <sander@lepik.eu>\n"
+"PO-Revision-Date: 2020-08-18 00:14+0300\n"
+"Last-Translator: Edmund Laugasson <edmund.laugasson@eesti.ee>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,19 +22,19 @@ msgstr ""
 #: nautilus-qdigidoc.py:74
 msgid "Sign selected file with ${DIGIDOC_NAME} Client"
 msgid_plural "Sign selected files with ${DIGIDOC_NAME} Client"
-msgstr[0] "Подписать выбранный файл с ${DIGIDOC_NAME} Client"
-msgstr[1] "Подписать выбранныйые файлы с ${DIGIDOC_NAME} Client"
-msgstr[2] "Подписать выбранныйые файлы с ${DIGIDOC_NAME} Client"
+msgstr[0] "Подпишите выбранный файл с клиентом ${DIGIDOC_NAME}"
+msgstr[1] "Подпишите выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
+msgstr[2] "Подпишите выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
 
 #: nautilus-qdigidoc.py:77
 msgid "Sign digitally"
-msgstr "Подписать дигитально"
+msgstr "Подпишите дигитально"
 
 msgid "Encrypt selected file with ${DIGIDOC_NAME} Client"
 msgid_plural "Encrypt selected files with ${DIGIDOC_NAME} Client"
-msgstr[0] "Зашифруйте выбранный файл ${DIGIDOC_NAME} клиентом"
-msgstr[1] "Зашифруйте выбранныйые файлы ${DIGIDOC_NAME} клиентом"
-msgstr[2] "Зашифруйте выбранныйые файлы ${DIGIDOC_NAME} клиентом"
+msgstr[0] "Зашифруйте выбранный файл с клиентом ${DIGIDOC_NAME}"
+msgstr[1] "Зашифруйте выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
+msgstr[2] "Зашифруйте выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
 
 msgid "Encrypt files"
 msgstr "Зашифруйте файлы"
