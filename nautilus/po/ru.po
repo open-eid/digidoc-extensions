@@ -20,21 +20,21 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: nautilus-qdigidoc.py:74
-msgid "Sign selected file with ${DIGIDOC_NAME} Client"
-msgid_plural "Sign selected files with ${DIGIDOC_NAME} Client"
-msgstr[0] "Подпишите выбранный файл с клиентом ${DIGIDOC_NAME}"
-msgstr[1] "Подпишите выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
-msgstr[2] "Подпишите выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
+msgid "Sign selected file with DigiDoc4 Client"
+msgid_plural "Sign selected files with DigiDoc4 Client"
+msgstr[0] "Подпишите выбранный файл с клиентом DigiDoc4"
+msgstr[1] "Подпишите выбранныйые файлы с клиентом DigiDoc4"
+msgstr[2] "Подпишите выбранныйые файлы с клиентом DigiDoc4"
 
 #: nautilus-qdigidoc.py:77
 msgid "Sign digitally"
 msgstr "Подпишите дигитально"
 
-msgid "Encrypt selected file with ${DIGIDOC_NAME} Client"
-msgid_plural "Encrypt selected files with ${DIGIDOC_NAME} Client"
-msgstr[0] "Зашифруйте выбранный файл с клиентом ${DIGIDOC_NAME}"
-msgstr[1] "Зашифруйте выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
-msgstr[2] "Зашифруйте выбранныйые файлы с клиентом ${DIGIDOC_NAME}"
+msgid "Encrypt selected file with DigiDoc4 Client"
+msgid_plural "Encrypt selected files with DigiDoc4 Client"
+msgstr[0] "Зашифруйте выбранный файл с клиентом DigiDoc4"
+msgstr[1] "Зашифруйте выбранныйые файлы с клиентом DigiDoc4"
+msgstr[2] "Зашифруйте выбранныйые файлы с клиентом DigiDoc4"
 
 msgid "Encrypt files"
 msgstr "Зашифруйте файлы"
