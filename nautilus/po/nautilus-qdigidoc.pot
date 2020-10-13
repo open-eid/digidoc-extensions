@@ -19,8 +19,8 @@ msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: nautilus-qdigidoc.py:74
-msgid "Sign selected file with ${DIGIDOC_NAME} Client"
-msgid_plural "Sign selected files with ${DIGIDOC_NAME} Client"
+msgid "Sign selected file with DigiDoc4 Client"
+msgid_plural "Sign selected files with DigiDoc4 Client"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -28,8 +28,8 @@ msgstr[1] ""
 msgid "Sign digitally"
 msgstr ""
 
-msgid "Encrypt selected file with ${DIGIDOC_NAME} Client"
-msgid_plural "Encrypt selected files with ${DIGIDOC_NAME} Client"
+msgid "Encrypt selected file with DigiDoc4 Client"
+msgid_plural "Encrypt selected files with DigiDoc4 Client"
 msgstr[0] ""
 msgstr[1] ""
 

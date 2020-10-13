@@ -18,10 +18,17 @@
 # Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 import os
-import urllib
 import gettext
 import locale
+import gi
 
+try:
+    # Python 3.
+    from urllib.parse import unquote
+except ImportError:
+    from urllib import unquote
+
+gi.require_version('Nautilus', '3.0')
 from gi.repository import Nautilus, GObject, Gio
 
 APP = 'nautilus-qdigidoc'
@@ -38,7 +45,7 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
         args = "-sign "
         for path in paths:
             args += "\"%s\" " % path
-        cmd = ("${DIGIDOC_EXECUTABLE} " + args + "&")
+        cmd = ("qdigidoc4 " + args + "&")
         os.system(cmd)
 
     def valid_file(self, file):
@@ -48,7 +55,7 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
         paths = []
         for file in files:
             if self.valid_file(file):
-                path = urllib.unquote(file.get_uri()[7:])
+                path = unquote(file.get_uri()[7:])
                 paths.append(path)
 
         if len(paths) < 1:
@@ -57,10 +64,10 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
         item = Nautilus.MenuItem(
             name="OpenDigidocExtension::DigidocSigner",
             label=gettext.gettext('Sign digitally'),
-            tip=gettext.ngettext('Sign selected file with ${DIGIDOC_NAME} Client',
-                                 'Sign selected files with ${DIGIDOC_NAME} Client',
+            tip=gettext.ngettext('Sign selected file with DigiDoc4 Client',
+                                 'Sign selected files with DigiDoc4 Client',
                                  len(paths)),
-            icon='${DIGIDOC_ICON}'
+            icon='qdigidoc4'
         )
         item.connect('activate', self.menu_activate_cb, paths)
         return item,
@@ -73,7 +80,7 @@ class OpenCryptoExtension(GObject.GObject, Nautilus.MenuProvider):
         args = "-crypto "
         for path in paths:
             args += "\"%s\" " % path
-        cmd = ("${DIGIDOC_EXECUTABLE} " + args + "&")
+        cmd = ("qdigidoc4 " + args + "&")
         os.system(cmd)
 
     def valid_file(self, file):
@@ -83,7 +90,7 @@ class OpenCryptoExtension(GObject.GObject, Nautilus.MenuProvider):
         paths = []
         for file in files:
             if self.valid_file(file):
-                path = urllib.unquote(file.get_uri()[7:])
+                path = unquote(file.get_uri()[7:])
                 paths.append(path)
 
         if len(paths) < 1:
@@ -92,10 +99,10 @@ class OpenCryptoExtension(GObject.GObject, Nautilus.MenuProvider):
         item = Nautilus.MenuItem(
             name="OpenCryptoExtension::DigidocEncrypter",
             label=gettext.gettext('Encrypt files'),
-            tip=gettext.ngettext('Encrypt selected file with ${DIGIDOC_NAME} Client',
-                                 'Encrypt selected files with ${DIGIDOC_NAME} Client',
+            tip=gettext.ngettext('Encrypt selected file with DigiDoc4 Client',
+                                 'Encrypt selected files with DigiDoc4 Client',
                                  len(paths)),
-            icon='${DIGIDOC_ICON}'
+            icon='qdigidoc4'
         )
         item.connect('activate', self.menu_activate_cb, paths)
         return item,
