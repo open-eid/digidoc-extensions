@@ -93,7 +93,7 @@ public:
 		std::string home = "~";
 		if(char *var = getenv("HOME"))
 			home = var;
-		return home + "/Library/Containers/ee.ria." BUNDLE_NAME "/Data/Library/Application Support/RIA/" BUNDLE_NAME "/";
+		return home + "/Library/Containers/ee.ria.qdigidoc4/Data/Library/Application Support/RIA/qdigidoc4/";
 	}
 };
 
@@ -115,7 +115,7 @@ OSStatus GeneratePreviewForURL(void */*thisInterface*/, QLPreviewRequestRef prev
 	{
 		digidoc::Conf::init( new DigidocConf );
 		digidoc::initialize();
-		std::unique_ptr<Container> d(Container::open([(__bridge NSURL*)url path].UTF8String));
+		std::unique_ptr<Container> d(Container::openPtr([(__bridge NSURL*)url path].UTF8String));
 
 		[h appendString:@"<font>Files</font><ol>"];
 		for (const DataFile *doc : d->dataFiles()) {

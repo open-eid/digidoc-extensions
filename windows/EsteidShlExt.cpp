@@ -1,15 +1,133 @@
 ﻿// EsteidShlExt.cpp : Implementation of CEsteidShlExt
+// http://msdn.microsoft.com/en-us/library/bb757020.aspx
 
 #include "stdafx.h"
 #include "EsteidShlExt.h"
 
+#include <uxtheme.h>
+
+typedef DWORD ARGB;
+
+bool HasAlpha(ARGB *pargb, SIZE &sizeImage, int cxRow)
+{
+	ULONG cxDelta = cxRow - sizeImage.cx;
+	for(ULONG y = sizeImage.cy; y; --y)
+	{
+		for(ULONG x = sizeImage.cx; x; --x)
+		{
+			if(*pargb++ & 0xFF000000)
+				return true;
+		}
+		pargb += cxDelta;
+	}
+	return false;
+}
+
+BITMAPINFO InitBitmapInfo(const SIZE &sizeImage)
+{
+	BITMAPINFO pbmi = {};
+	pbmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	pbmi.bmiHeader.biPlanes = 1;
+	pbmi.bmiHeader.biCompression = BI_RGB;
+
+	pbmi.bmiHeader.biWidth = sizeImage.cx;
+	pbmi.bmiHeader.biHeight = sizeImage.cy;
+	pbmi.bmiHeader.biBitCount = 32;
+	return pbmi;
+}
+
+HBITMAP Create32BitHBITMAP(HDC hdc, const SIZE &sizeImage, void **ppvBits)
+{
+	BITMAPINFO bmi = InitBitmapInfo(sizeImage);
+	if (HDC hdcUsed = hdc ? hdc : GetDC(nullptr))
+	{
+		HBITMAP phBmp = CreateDIBSection(hdcUsed, &bmi, DIB_RGB_COLORS, ppvBits, nullptr, 0);
+		if (hdc != hdcUsed)
+			ReleaseDC(NULL, hdcUsed);
+		return phBmp;
+	}
+	return nullptr;
+}
+
+HRESULT ConvertToPARGB32(HDC hdc, ARGB *pargb, HBITMAP hbmp, SIZE &sizeImage, int cxRow)
+{
+	BITMAPINFO bmi = InitBitmapInfo(sizeImage);
+	HRESULT hr = E_OUTOFMEMORY;
+	HANDLE hHeap = GetProcessHeap();
+	if (void *pvBits = HeapAlloc(hHeap, 0, bmi.bmiHeader.biWidth * 4 * bmi.bmiHeader.biHeight))
+	{
+		hr = E_UNEXPECTED;
+		if (GetDIBits(hdc, hbmp, 0, bmi.bmiHeader.biHeight, pvBits, &bmi, DIB_RGB_COLORS) == bmi.bmiHeader.biHeight)
+		{
+			ULONG cxDelta = cxRow - bmi.bmiHeader.biWidth;
+			ARGB *pargbMask = static_cast<ARGB *>(pvBits);
+			for (ULONG y = bmi.bmiHeader.biHeight; y; --y)
+			{
+				for (ULONG x = bmi.bmiHeader.biWidth; x; --x)
+				{
+					if (*pargbMask++) // transparent pixel
+						*pargb++ = 0;
+					else // opaque pixel
+						*pargb++ |= 0xFF000000;
+				}
+				pargb += cxDelta;
+			}
+			hr = S_OK;
+		}
+		HeapFree(hHeap, 0, pvBits);
+	}
+	return hr;
+}
+
+HRESULT ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon, SIZE &sizeIcon)
+{
+	RGBQUAD *prgbQuad;
+	int cxRow = 0;
+	HRESULT hr = GetBufferedPaintBits(hPaintBuffer, &prgbQuad, &cxRow);
+	if (SUCCEEDED(hr))
+	{
+		ARGB *pargb = reinterpret_cast<ARGB *>(prgbQuad);
+		if (!HasAlpha(pargb, sizeIcon, cxRow))
+		{
+			ICONINFO info = {};
+			if (GetIconInfo(hicon, &info))
+			{
+				if (info.hbmMask)
+					hr = ConvertToPARGB32(hdc, pargb, info.hbmMask, sizeIcon, cxRow);
+				DeleteObject(info.hbmColor);
+				DeleteObject(info.hbmMask);
+			}
+		}
+	}
+	return hr;
+}
+
 CEsteidShlExt::CEsteidShlExt()
 {
-	HDC screen = GetDC(nullptr);
-	double dpiy = GetDeviceCaps(screen, LOGPIXELSY);
-	ReleaseDC(nullptr, screen);
-	LPTSTR digidocBmpId = (dpiy / double(96)) > 1.0 ? MAKEINTRESOURCE(IDB_DIGIDOCBMP_32) : MAKEINTRESOURCE(IDB_DIGIDOCBMP);
-	m_DigidocBmp = LoadBitmap(_AtlBaseModule.GetModuleInstance(), digidocBmpId);
+	SIZE sizeIcon = { GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON) };
+	if(HICON hIcon = (HICON)LoadImage(_AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_DIGIDOCICO), IMAGE_ICON, sizeIcon.cx, sizeIcon.cy, LR_DEFAULTCOLOR|LR_CREATEDIBSECTION))
+	{
+		if(HDC hdcDest = CreateCompatibleDC(nullptr)) {
+			if((m_DigidocBmp = Create32BitHBITMAP(hdcDest, sizeIcon, nullptr))) {
+				if(HBITMAP hbmpOld = (HBITMAP)SelectObject(hdcDest, m_DigidocBmp)) {
+					RECT rcIcon = { 0, 0, sizeIcon.cx, sizeIcon.cy };
+					BLENDFUNCTION bfAlpha = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+					BP_PAINTPARAMS paintParams = { sizeof(paintParams), BPPF_ERASE, nullptr, &bfAlpha };
+					HDC hdcBuffer;
+					if(HPAINTBUFFER hPaintBuffer = BeginBufferedPaint(hdcDest, &rcIcon, BPBF_DIB, &paintParams, &hdcBuffer)) {
+						if(DrawIconEx(hdcBuffer, 0, 0, hIcon, sizeIcon.cx, sizeIcon.cy, 0, nullptr, DI_NORMAL)) {
+							// If icon did not have an alpha channel, we need to convert buffer to PARGB.
+							ConvertBufferToPARGB32(hPaintBuffer, hdcDest, hIcon, sizeIcon);
+						}
+						EndBufferedPaint(hPaintBuffer, TRUE);
+					}
+					SelectObject(hdcDest, hbmpOld);
+				}
+			}
+			DeleteDC(hdcDest);
+		}
+		DestroyIcon(hIcon);
+	}
 }
 
 CEsteidShlExt::~CEsteidShlExt()
@@ -170,17 +288,10 @@ STDMETHODIMP CEsteidShlExt::ExecuteDigidocclient(LPCMINVOKECOMMANDINFO /* pCmdIn
 		path.resize(path.find_last_of(_T('\\')) + 1);
 	}
 
-	// First try with DigiDoc4 Client and then with DigiDoc3
-	for(auto program : {_T("qdigidoc4.exe"), _T("qdigidocclient.exe")})
-	{
-		command = path + program;
-		if(PathFileExists(command.c_str()) == 1)
-			break;
-
+	command = path + _T("qdigidoc4.exe");
+	if(PathFileExists(command.c_str()) != 1) {
 		// Replace "c:\Program Files\" with "c:\Program Files (x86)\"
 		command.insert(16, _T(" (x86)"));
-		if(PathFileExists(command.c_str()) == 1)
-			break;
 	}
 
 	// Construct command line arguments to pass to qdigidocclient.exe

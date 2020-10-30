@@ -1,3 +1,14 @@
+cmake_minimum_required(VERSION 3.10)
+if(POLICY CMP0074)
+    cmake_policy(SET CMP0074 NEW)
+endif()
+project(digidocshellextension VERSION 3.13.8)
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+include( VersionInfo )
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(MIDL_TARGET "x64")
     set(PLATFORM "x64")
@@ -39,18 +50,20 @@ set_target_properties(EsteidShellExtension PROPERTIES
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}
     INTERPROCEDURAL_OPTIMIZATION YES
     LINK_OPTIONS "/guard:cf"
+    LINK_LIBRARIES "uxtheme.lib"
+    SKIP_AUTOMOC ON
 )
 
 add_custom_target(msishellext DEPENDS EsteidShellExtension
     COMMAND "$ENV{WIX}bin\\candle.exe" -nologo -arch ${PLATFORM}
         -dMSI_VERSION=${VERSION} -dPlatform=${PLATFORM} -dShellExt=$<TARGET_FILE:EsteidShellExtension>
         ${CMAKE_CURRENT_SOURCE_DIR}/EsteidShellExtension.wxs
-        ${CMAKE_SOURCE_DIR}/cmake/modules/WelcomeDlg2.wxs
-        ${CMAKE_SOURCE_DIR}/cmake/modules/WixUI_Minimal2.wxs
+        ${CMAKE_MODULE_PATH}/WelcomeDlg2.wxs
+        ${CMAKE_MODULE_PATH}/WixUI_Minimal2.wxs
     COMMAND "$ENV{WIX}bin\\light.exe" -nologo -ext WixUIExtension
         EsteidShellExtension.wixobj WelcomeDlg2.wixobj WixUI_Minimal2.wixobj
-        -dWixUIDialogBmp=${CMAKE_SOURCE_DIR}/cmake/modules/dlgbmp.bmp
-        -dWixUIBannerBmp=${CMAKE_SOURCE_DIR}/cmake/modules/banner.bmp
+        -dWixUIDialogBmp=${CMAKE_MODULE_PATH}/dlgbmp.bmp
+        -dWixUIBannerBmp=${CMAKE_MODULE_PATH}/banner.bmp
         -o "Digidoc_ShellExt-${VERSION}$ENV{VER_SUFFIX}.${PLATFORM}.msi"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )

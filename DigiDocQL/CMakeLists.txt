@@ -17,7 +17,6 @@ set_target_properties( DigiDocQL PROPERTIES
 	AUTOMOC OFF
 	INCLUDE_DIRECTORIES "${LIBDIGIDOCPP_INCLUDE_DIR}"
 	COMPILE_FLAGS "-Wno-unused-parameter"
-	COMPILE_DEFINITIONS "BUNDLE_NAME=\"${BUNDLE_NAME}\""
 	LINK_LIBRARIES "-framework QuickLook;-framework digidocpp;-framework Cocoa"
 	LINK_FLAGS "-F/Library/Frameworks -fobjc-arc"
 	BUILD_WITH_INSTALL_RPATH YES
