@@ -133,8 +133,7 @@ IDR_ESTEIDSHLEXT        REGISTRY                "EsteidShlExt.rgs"
 // Bitmap
 //
 
-IDB_DIGIDOCBMP          BITMAP                  "resources\\digidoc.bmp"
-IDB_DIGIDOCBMP_32       BITMAP                  "resources\\digidoc_32.bmp"
+IDB_DIGIDOCICO          ICON                    "resources\\digidoc.ico"
 
 #endif    // Estonian (Estonia) resources
 /////////////////////////////////////////////////////////////////////////////

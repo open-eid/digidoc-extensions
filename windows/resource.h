@@ -5,8 +5,7 @@
 #define IDS_PROJNAME                    100
 #define IDR_ESTEIDEXT                   101
 #define IDR_ESTEIDSHLEXT                102
-#define IDB_DIGIDOCBMP                  201
-#define IDB_DIGIDOCBMP_32               202
+#define IDB_DIGIDOCICO                  201
 
 // Next default values for new objects
 // 
