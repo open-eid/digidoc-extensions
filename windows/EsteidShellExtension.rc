@@ -125,8 +125,11 @@ LANGUAGE LANG_ESTONIAN, SUBLANG_DEFAULT
 // REGISTRY
 //
 
-IDR_ESTEIDSHLEXT        REGISTRY                "EsteidShlExt.rgs"
-
+#ifdef _WIN64
+IDR_ESTEIDSHLEXT        REGISTRY                "EsteidShlExt_x64.rgs"
+#else
+IDR_ESTEIDSHLEXT        REGISTRY                "EsteidShlExt_x86.rgs"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //

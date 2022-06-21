@@ -26,7 +26,11 @@ library EsteidShellExtensionLib
 {
 	importlib("stdole2.tlb");
 	[
+#ifdef _WIN64
+		uuid(5606A547-759D-43DA-AEEB-D3BF1D1E816D),
+#else
 		uuid(310AAB39-76FE-401B-8A7F-0F578C5F6AB5),
+#endif
 		helpstring("EsteidShlExt Class")
 	]
 	coclass EsteidShlExt
