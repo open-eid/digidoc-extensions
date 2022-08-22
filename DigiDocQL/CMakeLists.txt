@@ -17,7 +17,7 @@ set_target_properties(DigiDocQL PROPERTIES
     AUTOMOC OFF
     INCLUDE_DIRECTORIES ${LIBDIGIDOCPP_INCLUDE_DIR}
     COMPILE_FLAGS "-Wno-unused-parameter -fobjc-arc"
-    LINK_LIBRARIES "-framework digidocpp;-framework AppKit;-framework WebKit;-framework Quartz"
+    LINK_LIBRARIES "-framework digidocpp;-framework AppKit;-framework WebKit;-framework Quartz;-framework UniformTypeIdentifiers"
     LINK_FLAGS "-F/Library/Frameworks -fobjc-arc -fobjc-link-runtime -e _NSExtensionMain -fapplication-extension"
     BUILD_WITH_INSTALL_RPATH YES
     INSTALL_RPATH "@loader_path/../../../../Frameworks"

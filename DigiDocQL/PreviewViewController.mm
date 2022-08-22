@@ -91,6 +91,9 @@ public:
 @property (weak) IBOutlet WKWebView *webView;
 @end
 
+@interface PreviewProvider : QLPreviewProvider <QLPreviewingController>
+@end
+
 @implementation PreviewViewController
 
 - (NSString *)nibName {
@@ -199,4 +202,94 @@ public:
     });
 }
 
+@end
+
+@implementation PreviewProvider
+- (void)providePreviewForFileRequest:(QLFilePreviewRequest *)request completionHandler:(void (^)(QLPreviewReply * _Nullable reply, NSError * _Nullable error))handler
+{
+    QLPreviewReply* reply = [[QLPreviewReply alloc] initWithDataOfContentType:UTTypeHTML contentSize:CGSizeMake(800, 800)
+        dataCreationBlock:^NSData * _Nullable(QLPreviewReply * _Nonnull replyToUpdate, NSError *__autoreleasing  _Nullable * _Nullable error) {
+
+        NSMutableString *h = [NSMutableString string];
+        [h appendString:@"<html><head><style>"];
+        [h appendString:@"* { font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif };"];
+        [h appendString:@"body { font-size: 10pt };"];
+        [h appendString:@"h2 { padding-left: 50px; background: url(cid:asic.icns); background-size: 42px 42px; background-repeat:no-repeat; };"];
+        [h appendString:@"font, dt { color: #808080 };"];
+        [h appendString:@"dt { float: left; clear: left; margin-left: 30px; margin-right: 10px };"];
+        [h appendString:@"dl { margin-bottom: 10px };"];
+        [h appendString:@"</style></head><body>"];
+        [h appendFormat:@"<h2>%@<hr size='1' /></h2>", [NSString htmlEntityEncode:request.fileURL.lastPathComponent]];
+        try
+        {
+            digidoc::Conf::init(new DigidocConf());
+            digidoc::initialize();
+            std::unique_ptr<Container> d(Container::openPtr(request.fileURL.path.UTF8String));
+
+            [h appendString:@"<font>Files</font><ol>"];
+            for (const DataFile *doc : d->dataFiles()) {
+              [h appendFormat:@"<li>%@</li>", [NSString htmlEntityEncode:[NSString stdstring:doc->fileName()]]];
+            }
+            [h appendString:@"</ol>"];
+
+            [h appendString:@"<font>Signatures</font>"];
+            for (const Signature *s : d->signatures()) {
+                [h appendFormat:@"<dl><dt>Signer</dt><dd>%@</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->signedBy()]]];
+
+                NSString *date = [NSString stdstring:s->trustedSigningTime()];
+                [date stringByReplacingOccurrencesOfString:@"Z" withString:@"-0000"];
+                NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                [df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
+                NSDate *formateddate = [df dateFromString:date];
+                [df setTimeZone: [NSTimeZone defaultTimeZone]];
+                [df setDateFormat:@"YYYY-MM-dd HH:mm:ss z"];
+                [h appendFormat:@"<dt>Time</dt><dd>%@</dd>", [df stringFromDate:formateddate]];
+
+                Signature::Validator v(s);
+                NSString *status = @"not valid";
+                switch(v.status())
+                {
+                case Signature::Validator::Valid: status = @"valid"; break;
+                case Signature::Validator::Warning: status = @"valid with warnings"; break;
+                case Signature::Validator::NonQSCD: status = @"valid with limitations"; break;
+                case Signature::Validator::Test: status = @"valid test signature"; break;
+                case Signature::Validator::Invalid: status = @"invalid"; break;
+                case Signature::Validator::Unknown: status = @"unknown"; break;
+                }
+                [h appendFormat:@"<dt>Validity</dt><dd>Signature is %@</dd>", status];
+
+                NSMutableArray *roles = [NSMutableArray array];
+                for (const std::string &role : s->signerRoles()) {
+                    if( !role.empty() ) {
+                       [roles addObject:[NSString htmlEntityEncode:[NSString stdstring:role]]];
+                    }
+                }
+                if( [roles count] > 0 ) {
+                    [h appendFormat:@"<dt>Role</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[roles componentsJoinedByString:@" / "]]];
+                }
+                if (!s->countryName().empty()) {
+                    [h appendFormat:@"<dt>Country</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->countryName()]]];
+                }
+                if (!s->city().empty()) {
+                    [h appendFormat:@"<dt>City</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->city()]]];
+                }
+                if (!s->stateOrProvince().empty()) {
+                    [h appendFormat:@"<dt>State</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->stateOrProvince()]]];
+                }
+                if (!s->postalCode().empty()) {
+                    [h appendFormat:@"<dt>Postal code</dt><dd>%@&nbsp;</dd>", [NSString htmlEntityEncode:[NSString stdstring:s->postalCode()]]];
+                }
+                [h appendString:@"</dl>"];
+            }
+            digidoc::terminate();
+        } catch (const Exception &e) {
+            NSMutableArray *err = [NSMutableArray array];
+            [NSString parseException:e result:err];
+            [h appendFormat:@"Failed to load document:<br />%@", [err componentsJoinedByString:@"<br />"]];
+        }
+        [h appendString:@"</body></html>"];
+        return [h dataUsingEncoding:NSUTF8StringEncoding];
+    }];
+    handler(reply, nil);
+}
 @end
