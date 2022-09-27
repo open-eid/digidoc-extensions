@@ -17,20 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: nautilus-qdigidoc.py:74
-msgid "Sign selected file with DigiDoc4 Client"
-msgid_plural "Sign selected files with DigiDoc4 Client"
-msgstr[0] "Allkirjasta valitud fail DigiDoc4 kliendiga"
-msgstr[1] "Allkirjasta valitud failid DigiDoc4 kliendiga"
-
-#: nautilus-qdigidoc.py:77
-msgid "Sign digitally"
-msgstr "Allkirjasta digitaalselt"
+msgid "Encrypt files"
+msgstr "Krüpteeri failid"
 
 msgid "Encrypt selected file with DigiDoc4 Client"
 msgid_plural "Encrypt selected files with DigiDoc4 Client"
 msgstr[0] "Krüpteeri valitud fail DigiDoc4 kliendiga"
 msgstr[1] "Krüpteeri valitud failid DigiDoc4 kliendiga"
 
-msgid "Encrypt files"
-msgstr "Krüpteeri failid"
+#: nautilus-qdigidoc.py:77
+msgid "Sign digitally"
+msgstr "Allkirjasta digitaalselt"
+
+#: nautilus-qdigidoc.py:74
+msgid "Sign selected file with DigiDoc4 Client"
+msgid_plural "Sign selected files with DigiDoc4 Client"
+msgstr[0] "Allkirjasta valitud fail DigiDoc4 kliendiga"
+msgstr[1] "Allkirjasta valitud failid DigiDoc4 kliendiga"

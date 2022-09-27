@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
-project(digidocshellextension VERSION 3.13.8)
+project(digidocshellextension VERSION 3.13.9)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules")
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include( VersionInfo )
@@ -41,7 +41,8 @@ add_library(EsteidShellExtension SHARED
     stdafx.cpp
     EsteidShellExtension.rc
     EsteidShellExtension.rgs
-    EsteidShlExt.rgs
+	EsteidShlExt_x86.rgs
+	EsteidShlExt_x64.rgs
 )
 set_target_properties(EsteidShellExtension PROPERTIES
     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
