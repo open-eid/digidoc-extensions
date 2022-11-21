@@ -28,8 +28,9 @@ try:
 except ImportError:
     from urllib import unquote
 
-gi.require_version('Nautilus', '3.0')
 from gi.repository import Nautilus, GObject, Gio
+if hasattr(Nautilus, "LocationWidgetProvider"):
+     gi.require_version('Nautilus', '3.0')
 
 APP = 'nautilus-qdigidoc'
 
@@ -39,7 +40,7 @@ gettext.textdomain(APP)
 
 class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
     def __init__(self):
-        pass
+        super().__init__()
 
     def menu_activate_cb(self, menu, paths):
         args = "-sign "
@@ -51,15 +52,16 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
     def valid_file(self, file):
         return file.get_file_type() == Gio.FileType.REGULAR and file.get_uri_scheme() == 'file'
 
-    def get_file_items(self, window, files):
+    def get_file_items(self, *args):
         paths = []
+        files = args[-1]
         for file in files:
             if self.valid_file(file):
                 path = unquote(file.get_uri()[7:])
                 paths.append(path)
 
         if len(paths) < 1:
-            return
+            return []
 
         item = Nautilus.MenuItem(
             name="OpenDigidocExtension::DigidocSigner",
@@ -70,11 +72,14 @@ class OpenDigidocExtension(GObject.GObject, Nautilus.MenuProvider):
             icon='qdigidoc4'
         )
         item.connect('activate', self.menu_activate_cb, paths)
-        return item,
+        return [item]
+
+    def get_background_items(self, current_folder):
+        return []
 
 class OpenCryptoExtension(GObject.GObject, Nautilus.MenuProvider):
     def __init__(self):
-        pass
+        super().__init__()
 
     def menu_activate_cb(self, menu, paths):
         args = "-crypto "
@@ -86,15 +91,16 @@ class OpenCryptoExtension(GObject.GObject, Nautilus.MenuProvider):
     def valid_file(self, file):
         return file.get_file_type() == Gio.FileType.REGULAR and file.get_uri_scheme() == 'file'
 
-    def get_file_items(self, window, files):
+    def get_file_items(self, *args):
         paths = []
+        files = args[-1]
         for file in files:
             if self.valid_file(file):
                 path = unquote(file.get_uri()[7:])
                 paths.append(path)
 
         if len(paths) < 1:
-            return
+            return []
 
         item = Nautilus.MenuItem(
             name="OpenCryptoExtension::DigidocEncrypter",
@@ -105,4 +111,7 @@ class OpenCryptoExtension(GObject.GObject, Nautilus.MenuProvider):
             icon='qdigidoc4'
         )
         item.connect('activate', self.menu_activate_cb, paths)
-        return item,
+        return [item]
+
+    def get_background_items(self, current_folder):
+        return []
