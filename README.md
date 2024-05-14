@@ -1,5 +1,8 @@
 # digidocshellextension
 
+**NB! Please note that the Shell extension code was moved to DigiDoc4 Client repository.<br>
+We won't be accepting pull requests or responding to issues in this repository anymore. We are happy to accept your proposals in the DigiDoc4 Client repository: https://github.com/open-eid/DigiDoc4-Client.**
+
  * License: LGPL 2.1
  * &copy; Estonian Information System Authority
  * [Architecture of ID-software](http://open-eid.github.io)
